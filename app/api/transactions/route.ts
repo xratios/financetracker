@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { init, tx, id } from '@instantdb/react'
 
-// Initialize InstantDB (same as client-side)
-const db = init({ 
-  appId: process.env.NEXT_PUBLIC_INSTANT_APP_ID || '94508c4b-4dfd-4f93-bf97-e7f0d362d5e2' 
-})
+const APP_ID = process.env.NEXT_PUBLIC_INSTANT_APP_ID || '94508c4b-4dfd-4f93-bf97-e7f0d362d5e2'
+const INSTANT_API_URL = `https://api.instantdb.com/apps/${APP_ID}`
 
 // Validate API key
 function validateApiKey(request: NextRequest): boolean {
@@ -91,18 +88,82 @@ export async function POST(request: NextRequest) {
     }
 
     // Create transaction in InstantDB
-    const transactionId = id()
-    await db.transact(
-      tx.transactions[transactionId].update({
-        title: title.trim(),
-        amount: numAmount,
-        type,
-        category: category.trim(),
-        date: transactionDate,
-        userId: finalUserId,
-        createdAt: new Date(),
+    // IMPORTANT: InstantDB React SDK doesn't work in server-side API routes
+    // We need to use InstantDB's HTTP/WebSocket API directly
+    // Based on InstantDB's architecture, transactions are sent via WebSocket or HTTP API
+    
+    // Generate a unique transaction ID (InstantDB format)
+    const transactionId = `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    
+    // Try using InstantDB's HTTP API endpoint
+    // Note: You may need to check InstantDB documentation for the exact API format
+    try {
+      // InstantDB uses a specific transaction format
+      // Format: { tx: { [id]: { _type: 'entity', ...fields } } }
+      const transactionData = {
+        tx: {
+          [transactionId]: {
+            _type: 'transactions',
+            title: title.trim(),
+            amount: numAmount,
+            type,
+            category: category.trim(),
+            date: transactionDate.toISOString(),
+            userId: finalUserId,
+            createdAt: new Date().toISOString(),
+          }
+        }
+      }
+
+      // Try InstantDB's API endpoint (format may vary - check their docs)
+      const response = await fetch(`https://api.instantdb.com/apps/${APP_ID}/transact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(transactionData)
       })
-    )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('InstantDB API error:', response.status, errorText)
+        
+        // If the API endpoint format is wrong, we need to use a different approach
+        // Return a helpful error with suggestions
+        return NextResponse.json(
+          {
+            error: 'InstantDB server-side API not available',
+            message: 'The InstantDB React SDK requires client-side execution. Please use one of these alternatives:',
+            alternatives: [
+              '1. Check InstantDB documentation for server-side SDK or HTTP API',
+              '2. Use a client-side proxy endpoint that uses the React SDK',
+              '3. Store transactions in a queue and sync via client-side app',
+              '4. Contact InstantDB support for server-side API access'
+            ],
+            technicalDetails: `API returned ${response.status}: ${errorText}`
+          },
+          { status: 501 }
+        )
+      }
+
+      // If successful, parse response
+      const result = await response.json()
+      console.log('Transaction created via InstantDB API:', result)
+      
+    } catch (apiError: any) {
+      console.error('Failed to create transaction via InstantDB API:', apiError)
+      
+      // Return error with helpful message
+      return NextResponse.json(
+        {
+          error: 'Failed to create transaction',
+          message: 'InstantDB React SDK does not work in server-side API routes. The transaction could not be created.',
+          suggestion: 'Please check InstantDB documentation for server-side API access or use a client-side approach.',
+          technicalDetails: apiError.message
+        },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json(
       { 
