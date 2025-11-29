@@ -27,13 +27,9 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
 
   // Query transactions - permissions will filter by userId on the server side
-  const { data, isLoading: dataLoading, error: queryError } = db.useQuery(
-    user
-      ? {
-          transactions: {},
-        }
-      : {}
-  )
+  const { data, isLoading: dataLoading, error: queryError } = db.useQuery({
+    transactions: {},
+  })
 
   // Debug logging
   if (user && data) {

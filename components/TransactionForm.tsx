@@ -5,7 +5,7 @@ import { X } from 'lucide-react'
 import { Transaction } from '@/app/page'
 
 interface TransactionFormProps {
-  onSubmit: (transaction: Omit<Transaction, 'id'>) => void
+  onSubmit: (transaction: Omit<Transaction, 'id' | 'userId'>) => void
   onCancel: () => void
 }
 
