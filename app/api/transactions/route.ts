@@ -20,42 +20,9 @@ function validateApiKey(request: NextRequest): boolean {
   return apiKey === expectedApiKey
 }
 
-// Find user by email in InstantDB
-// Note: InstantDB auth users might not be directly queryable via useQuery
-// Alternative: Accept userId directly in the request, or maintain a user mapping
-async function findUserByEmail(email: string): Promise<string | null> {
-  try {
-    // Option 1: Try to query users (may not work if InstantDB auth users aren't in regular schema)
-    // Option 2: Accept userId directly from n8n instead of email
-    // Option 3: Maintain a separate user mapping table
-    
-    // For now, we'll try querying - if this doesn't work, you may need to:
-    // - Pass userId directly from n8n instead of email
-    // - Or create a user mapping table in InstantDB
-    
-    // Note: useQuery might not work in server-side API routes
-    // This is a limitation - consider using userId directly or a different approach
-    const { data } = await db.useQuery({
-      users: {
-        $: {
-          where: { email },
-        },
-      },
-    })
-    
-    if (data?.users && data.users.length > 0) {
-      return data.users[0].id
-    }
-    
-    return null
-  } catch (error) {
-    console.error('Error finding user by email:', error)
-    // If useQuery doesn't work in API routes, you'll need to:
-    // 1. Accept userId directly in the request body instead of email
-    // 2. Or create a user mapping mechanism
-    return null
-  }
-}
+// Note: Email lookup is not supported in API routes because InstantDB React SDK's useQuery
+// is a React hook and doesn't work in server-side API routes.
+// Users must provide userId directly in the request body.
 
 export async function POST(request: NextRequest) {
   try {
@@ -69,14 +36,14 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json()
-    const { title, amount, type, category, date, userEmail, userId } = body
+    const { title, amount, type, category, date, userId } = body
 
-    // Validate required fields - either userEmail OR userId must be provided
-    if (!title || amount === undefined || !type || !category || !date || (!userEmail && !userId)) {
+    // Validate required fields
+    if (!title || amount === undefined || !type || !category || !date || !userId) {
       return NextResponse.json(
         { 
           error: 'Missing required fields',
-          required: ['title', 'amount', 'type', 'category', 'date', 'userEmail OR userId'],
+          required: ['title', 'amount', 'type', 'category', 'date', 'userId'],
           received: Object.keys(body)
         },
         { status: 400 }
@@ -99,39 +66,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get userId - either provided directly or lookup by email
-    let finalUserId: string | null = userId
-    
-    if (!finalUserId && userEmail) {
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(userEmail)) {
-        return NextResponse.json(
-          { error: 'Invalid email format.' },
-          { status: 400 }
-        )
-      }
-
-      // Try to find user by email (may not work - see note in findUserByEmail function)
-      finalUserId = await findUserByEmail(userEmail)
-      if (!finalUserId) {
-        return NextResponse.json(
-          { 
-            error: 'User not found',
-            message: `No user found with email: ${userEmail}. Please provide userId directly or ensure the user exists in InstantDB.`,
-            suggestion: 'Consider passing userId directly in the request body instead of userEmail'
-          },
-          { status: 404 }
-        )
-      }
-    }
-    
-    if (!finalUserId) {
+    // Validate userId is provided and is a string
+    if (!userId || typeof userId !== 'string') {
       return NextResponse.json(
-        { error: 'userId is required. Provide either userId or userEmail in the request body.' },
+        { 
+          error: 'userId is required',
+          message: 'Please provide userId directly in the request body. Email lookup is not supported in API routes.',
+          example: { userId: 'user-id-from-instantdb' },
+          note: 'You can find your userId by checking the browser console after logging into the web app, or by querying InstantDB directly.'
+        },
         { status: 400 }
       )
     }
+    
+    const finalUserId = userId
 
     // Parse and validate date
     const transactionDate = new Date(date)
@@ -198,40 +146,25 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const userEmail = searchParams.get('userEmail')
+    const userId = searchParams.get('userId')
 
-    if (!userEmail) {
+    if (!userId) {
       return NextResponse.json(
-        { error: 'Missing required parameter: userEmail' },
+        { error: 'Missing required parameter: userId' },
         { status: 400 }
       )
     }
 
-    // Find user by email
-    const userId = await findUserByEmail(userEmail)
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
-    }
-
-    // Query transactions for the user
-    const { data } = await db.useQuery({
-      transactions: {
-        $: {
-          where: { userId },
-        },
-      },
-    })
-
+    // Note: useQuery doesn't work in server-side API routes
+    // This GET endpoint is disabled - use the client-side query instead
+    // For API access, consider implementing a different approach or removing this endpoint
     return NextResponse.json(
       { 
-        success: true,
-        transactions: data?.transactions || [],
-        count: data?.transactions?.length || 0
+        error: 'GET endpoint not fully supported',
+        message: 'useQuery does not work in server-side API routes. Please use the web app to query transactions.',
+        note: 'This endpoint may be removed in a future version.'
       },
-      { status: 200 }
+      { status: 501 }
     )
   } catch (error: any) {
     console.error('API Error:', error)
