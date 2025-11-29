@@ -1,0 +1,174 @@
+'use client'
+
+import { useState } from 'react'
+import { X } from 'lucide-react'
+import { Transaction } from '@/app/page'
+
+interface TransactionFormProps {
+  onSubmit: (transaction: Omit<Transaction, 'id'>) => void
+  onCancel: () => void
+}
+
+const categories = {
+  income: ['Salary', 'Freelance', 'Investment', 'Gift', 'Other'],
+  expense: ['Food', 'Transport', 'Shopping', 'Bills', 'Entertainment', 'Other'],
+}
+
+export default function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
+  const [formData, setFormData] = useState({
+    title: '',
+    amount: '',
+    type: 'expense' as 'income' | 'expense',
+    category: '',
+    date: new Date().toISOString().split('T')[0],
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!formData.title || !formData.amount || !formData.category) {
+      alert('Please fill in all fields')
+      return
+    }
+    onSubmit({
+      title: formData.title,
+      amount: parseFloat(formData.amount),
+      type: formData.type,
+      category: formData.category,
+      date: formData.date,
+    })
+    setFormData({
+      title: '',
+      amount: '',
+      type: 'expense',
+      category: '',
+      date: new Date().toISOString().split('T')[0],
+    })
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold gradient-text">Add Transaction</h2>
+        <button
+          onClick={onCancel}
+          className="text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <X size={24} />
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Type
+          </label>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({ ...formData, type: 'income', category: '' })
+              }}
+              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                formData.type === 'income'
+                  ? 'bg-green-500 text-white'
+                  : 'bg-green-100 text-green-700 hover:bg-green-200'
+              }`}
+            >
+              Income
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({ ...formData, type: 'expense', category: '' })
+              }}
+              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                formData.type === 'expense'
+                  ? 'bg-red-500 text-white'
+                  : 'bg-red-100 text-red-700 hover:bg-red-200'
+              }`}
+            >
+              Expense
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Title
+          </label>
+          <input
+            type="text"
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+            placeholder="Enter transaction title"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Amount
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            value={formData.amount}
+            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+            placeholder="0.00"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Category
+          </label>
+          <select
+            value={formData.category}
+            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+            required
+          >
+            <option value="">Select a category</option>
+            {categories[formData.type].map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Date
+          </label>
+          <input
+            type="date"
+            value={formData.date}
+            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+            required
+          />
+        </div>
+
+        <div className="flex gap-3 pt-4">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="flex-1 py-3 px-4 bg-gradient-orange text-white rounded-lg font-medium hover:opacity-90 transition-all shadow-lg"
+          >
+            Add Transaction
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
