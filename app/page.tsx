@@ -1,11 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Plus, TrendingUp, TrendingDown, Wallet, Filter } from 'lucide-react'
+import { useState } from 'react'
+import { Plus, TrendingUp, TrendingDown, Wallet, LogOut, Loader2 } from 'lucide-react'
+import { id, tx } from '@instantdb/react'
 import TransactionList from '@/components/TransactionList'
 import TransactionForm from '@/components/TransactionForm'
 import StatsCard from '@/components/StatsCard'
 import ExpenseChart from '@/components/ExpenseChart'
+import Auth from '@/components/Auth'
+import { db } from '@/lib/instant'
 
 export interface Transaction {
   id: string
@@ -14,39 +17,100 @@ export interface Transaction {
   type: 'income' | 'expense'
   category: string
   date: string
+  userId: string
 }
 
 export default function Home() {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const { user, isLoading: authLoading } = db.useAuth()
   const [showForm, setShowForm] = useState(false)
   const [filter, setFilter] = useState<'all' | 'income' | 'expense'>('all')
+  const [error, setError] = useState<string | null>(null)
 
-  // Load transactions from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('transactions')
-    if (saved) {
-      setTransactions(JSON.parse(saved))
-    }
-  }, [])
+  // Query transactions - permissions will filter by userId on the server side
+  const { data, isLoading: dataLoading, error: queryError } = db.useQuery(
+    user
+      ? {
+          transactions: {},
+        }
+      : {}
+  )
 
-  // Save transactions to localStorage
-  useEffect(() => {
-    if (transactions.length > 0) {
-      localStorage.setItem('transactions', JSON.stringify(transactions))
-    }
-  }, [transactions])
-
-  const addTransaction = (transaction: Omit<Transaction, 'id'>) => {
-    const newTransaction: Transaction = {
-      ...transaction,
-      id: Date.now().toString(),
-    }
-    setTransactions([newTransaction, ...transactions])
-    setShowForm(false)
+  // Debug logging
+  if (user && data) {
+    console.log('Query data:', data)
+    console.log('User ID:', user.id)
+    console.log('All transactions:', data?.transactions)
+    console.log('Transactions count:', data?.transactions?.length || 0)
+  }
+  if (queryError) {
+    console.error('Query error:', queryError)
   }
 
-  const deleteTransaction = (id: string) => {
-    setTransactions(transactions.filter(t => t.id !== id))
+  // Map InstantDB data to Transaction format, converting dates to strings
+  // Filter by userId on client side as well for security (permissions should also enforce this)
+  const allTransactions = (data?.transactions || []).map((t: any) => ({
+    id: t.id,
+    title: t.title,
+    amount: t.amount,
+    type: t.type,
+    category: t.category,
+    date: t.date instanceof Date ? t.date.toISOString().split('T')[0] : (typeof t.date === 'string' ? t.date : new Date(t.date).toISOString().split('T')[0]),
+    userId: t.userId,
+  }))
+
+  // Filter by userId - CRITICAL for security
+  const transactions: Transaction[] = user 
+    ? allTransactions.filter(t => t.userId === user.id)
+    : []
+
+  // Show auth screen if not authenticated
+  if (!authLoading && !user) {
+    return <Auth />
+  }
+
+  const addTransaction = async (transaction: Omit<Transaction, 'id' | 'userId'>) => {
+    if (!user) {
+      setError('You must be logged in to add transactions')
+      return
+    }
+
+    try {
+      setError(null)
+      db.transact(
+        tx.transactions[id()].update({
+          ...transaction,
+          date: new Date(transaction.date), // Convert string to Date object
+          userId: user.id, // CRITICAL - permission rules enforce this
+        })
+      )
+      setShowForm(false)
+    } catch (err) {
+      setError('Failed to add transaction. Please try again.')
+      console.error('Error adding transaction:', err)
+    }
+  }
+
+  const deleteTransaction = async (transactionId: string) => {
+    if (!user) {
+      setError('You must be logged in to delete transactions')
+      return
+    }
+
+    try {
+      setError(null)
+      db.transact(tx.transactions[transactionId].delete())
+    } catch (err) {
+      setError('Failed to delete transaction. Please try again.')
+      console.error('Error deleting transaction:', err)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await db.auth.signOut()
+    } catch (err) {
+      console.error('Error signing out:', err)
+    }
   }
 
   const filteredTransactions = transactions.filter(t => 
@@ -63,6 +127,17 @@ export default function Home() {
 
   const balance = totalIncome - totalExpense
 
+  if (authLoading || dataLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 via-blue-50 to-cyan-100">
+        <div className="text-center">
+          <Loader2 className="animate-spin mx-auto mb-4 text-cyan-600" size={48} />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -73,18 +148,39 @@ export default function Home() {
               <h1 className="text-3xl font-bold">Finance Tracker</h1>
               <p className="text-orange-100 dark:text-orange-200 mt-1">Manage your money with confidence</p>
             </div>
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-sm px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 border border-white/30 dark:border-white/20"
-            >
-              <Plus size={20} />
-              Add Transaction
-            </button>
+            <div className="flex items-center gap-3">
+              {user && (
+                <div className="text-sm text-orange-100 dark:text-orange-200">
+                  {user.email || 'User'}
+                </div>
+              )}
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-sm px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 border border-white/30 dark:border-white/20"
+              >
+                <Plus size={20} />
+                Add Transaction
+              </button>
+              <button
+                onClick={handleLogout}
+                className="bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-sm px-4 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 border border-white/30 dark:border-white/20"
+                title="Sign out"
+              >
+                <LogOut size={20} />
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300">
+            {error}
+          </div>
+        )}
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <StatsCard
