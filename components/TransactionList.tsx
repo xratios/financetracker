@@ -28,11 +28,11 @@ export default function TransactionList({ transactions, onDelete }: TransactionL
   if (transactions.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="text-gray-400 mb-4">
+        <div className="text-gray-400 dark:text-gray-500 mb-4">
           <Wallet size={48} className="mx-auto opacity-50" />
         </div>
-        <p className="text-gray-500">No transactions yet</p>
-        <p className="text-sm text-gray-400 mt-1">Add your first transaction to get started</p>
+        <p className="text-gray-500 dark:text-gray-400">No transactions yet</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Add your first transaction to get started</p>
       </div>
     )
   }
@@ -42,15 +42,15 @@ export default function TransactionList({ transactions, onDelete }: TransactionL
       {transactions.map((transaction) => (
         <div
           key={transaction.id}
-          className="bg-white rounded-xl p-4 border border-gray-100 hover:border-orange-200 hover:shadow-md transition-all duration-200"
+          className="bg-white dark:bg-gray-700/50 rounded-xl p-4 border border-gray-100 dark:border-gray-600 hover:border-orange-200 dark:hover:border-orange-500/50 hover:shadow-md dark:hover:shadow-lg transition-all duration-200"
         >
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-3 flex-1">
               <div
                 className={`p-2 rounded-lg ${
                   transaction.type === 'income'
-                    ? 'bg-green-100 text-green-600'
-                    : 'bg-red-100 text-red-600'
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                    : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
                 }`}
               >
                 {transaction.type === 'income' ? (
@@ -60,20 +60,20 @@ export default function TransactionList({ transactions, onDelete }: TransactionL
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 truncate">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate">
                   {transaction.title}
                 </h3>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-gray-500">{transaction.category}</span>
-                  <span className="text-xs text-gray-400">•</span>
-                  <span className="text-xs text-gray-500">{formatDate(transaction.date)}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{transaction.category}</span>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">•</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{formatDate(transaction.date)}</span>
                 </div>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <span
                 className={`font-bold ${
-                  transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                  transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                 }`}
               >
                 {transaction.type === 'income' ? '+' : '-'}
@@ -81,7 +81,7 @@ export default function TransactionList({ transactions, onDelete }: TransactionL
               </span>
               <button
                 onClick={() => onDelete(transaction.id)}
-                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
                 aria-label="Delete transaction"
               >
                 <Trash2 size={18} />

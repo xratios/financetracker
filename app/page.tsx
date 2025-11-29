@@ -66,16 +66,16 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-gradient-orange text-white shadow-lg">
+      <header className="bg-gradient-orange text-white shadow-lg dark:shadow-2xl">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">Finance Tracker</h1>
-              <p className="text-orange-100 mt-1">Manage your money with confidence</p>
+              <p className="text-orange-100 dark:text-orange-200 mt-1">Manage your money with confidence</p>
             </div>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 border border-white/30"
+              className="bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-sm px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 border border-white/30 dark:border-white/20"
             >
               <Plus size={20} />
               Add Transaction
@@ -109,8 +109,8 @@ export default function Home() {
 
         {/* Transaction Form Modal */}
         {showForm && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in">
+          <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in">
               <TransactionForm
                 onSubmit={addTransaction}
                 onCancel={() => setShowForm(false)}
@@ -139,7 +139,7 @@ export default function Home() {
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
                       filter === 'all'
                         ? 'bg-orange-500 text-white'
-                        : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                        : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50'
                     }`}
                   >
                     All
@@ -149,7 +149,7 @@ export default function Home() {
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
                       filter === 'income'
                         ? 'bg-green-500 text-white'
-                        : 'bg-green-100 text-green-700 hover:bg-green-200'
+                        : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50'
                     }`}
                   >
                     Income
@@ -159,7 +159,7 @@ export default function Home() {
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
                       filter === 'expense'
                         ? 'bg-red-500 text-white'
-                        : 'bg-red-100 text-red-700 hover:bg-red-200'
+                        : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50'
                     }`}
                   >
                     Expense

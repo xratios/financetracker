@@ -51,7 +51,7 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
         <h2 className="text-2xl font-bold gradient-text">Add Transaction</h2>
         <button
           onClick={onCancel}
-          className="text-gray-400 hover:text-gray-600 transition-colors"
+          className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
         >
           <X size={24} />
         </button>
@@ -59,7 +59,7 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Type
           </label>
           <div className="flex gap-2">
@@ -71,7 +71,7 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
               className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
                 formData.type === 'income'
                   ? 'bg-green-500 text-white'
-                  : 'bg-green-100 text-green-700 hover:bg-green-200'
+                  : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50'
               }`}
             >
               Income
@@ -84,7 +84,7 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
               className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
                 formData.type === 'expense'
                   ? 'bg-red-500 text-white'
-                  : 'bg-red-100 text-red-700 hover:bg-red-200'
+                  : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50'
               }`}
             >
               Expense
@@ -93,21 +93,21 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Title
           </label>
           <input
             type="text"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
             placeholder="Enter transaction title"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Amount
           </label>
           <input
@@ -115,20 +115,20 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
             step="0.01"
             value={formData.amount}
             onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
             placeholder="0.00"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Category
           </label>
           <select
             value={formData.category}
             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
             required
           >
             <option value="">Select a category</option>
@@ -141,14 +141,14 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Date
           </label>
           <input
             type="date"
             value={formData.date}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
             required
           />
         </div>
@@ -157,7 +157,7 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all"
+            className="flex-1 py-3 px-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
           >
             Cancel
           </button>

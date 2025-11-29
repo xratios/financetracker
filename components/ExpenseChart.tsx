@@ -7,7 +7,18 @@ interface ExpenseChartProps {
   transactions: Transaction[]
 }
 
-const COLORS = ['#f97316', '#ea580c', '#c2410c', '#9a3412', '#fb923c', '#fdba74']
+const COLORS = [
+  '#f97316', // Orange
+  '#3b82f6', // Blue
+  '#10b981', // Green
+  '#8b5cf6', // Purple
+  '#ef4444', // Red
+  '#f59e0b', // Amber
+  '#06b6d4', // Cyan
+  '#ec4899', // Pink
+  '#14b8a6', // Teal
+  '#6366f1', // Indigo
+]
 
 export default function ExpenseChart({ transactions }: ExpenseChartProps) {
   // Calculate expenses by category
@@ -26,8 +37,8 @@ export default function ExpenseChart({ transactions }: ExpenseChartProps) {
   if (expenseData.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">No expense data to display</p>
-        <p className="text-sm text-gray-400 mt-1">Add some expenses to see the chart</p>
+        <p className="text-gray-500 dark:text-gray-400">No expense data to display</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Add some expenses to see the chart</p>
       </div>
     )
   }
@@ -35,9 +46,9 @@ export default function ExpenseChart({ transactions }: ExpenseChartProps) {
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-          <p className="font-semibold text-gray-900">{payload[0].name}</p>
-          <p className="text-orange-600 font-bold">
+        <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+          <p className="font-semibold text-gray-900 dark:text-gray-100">{payload[0].name}</p>
+          <p className="text-orange-600 dark:text-orange-400 font-bold">
             {new Intl.NumberFormat('en-MY', {
               style: 'currency',
               currency: 'MYR',
@@ -68,7 +79,9 @@ export default function ExpenseChart({ transactions }: ExpenseChartProps) {
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
-          <Legend />
+          <Legend 
+            wrapperStyle={{ color: '#d1d5db' }}
+          />
         </PieChart>
       </ResponsiveContainer>
     </div>
