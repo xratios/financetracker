@@ -240,23 +240,97 @@ console.log(data);
    }
    ```
 
-## Integration with n8n + Telegram Bot
+## Integration with n8n
 
-1. **Telegram Bot** receives message from user
-2. **n8n AI Agent** parses the message and extracts:
+### Option 1: n8n → Next.js (Create Transactions)
+
+**Workflow:**
+1. **n8n Webhook** receives data (from Telegram, email, API, etc.)
+2. **n8n AI Agent/Function Node** parses and extracts:
    - Transaction details (title, amount, type, category)
-   - User email (from Telegram user mapping or bot context)
-   - Date (current date or parsed from message)
+   - User ID (from user mapping or context)
+   - Date (current date or parsed from input)
 3. **n8n HTTP Request Node** sends POST request to `/api/transactions`
-4. **API** validates, finds user, and saves transaction to InstantDB
-5. **n8n** sends confirmation back to Telegram user
+4. **Next.js API** validates, authenticates, and saves transaction to InstantDB using Admin SDK
+5. **InstantDB** syncs transaction to all connected clients in real-time
+6. **n8n** (optional) sends confirmation back to user
+
+**n8n Workflow Setup:**
+1. Add a **Webhook** trigger node (or any other trigger)
+2. Add an **HTTP Request** node:
+   - Method: `POST`
+   - URL: `https://your-app.vercel.app/api/transactions` (or `http://localhost:3000/api/transactions` for dev)
+   - Authentication: Header Auth
+     - Name: `X-API-Key`
+     - Value: `{{ $env.API_KEY }}` (or hardcode your API key)
+   - Headers:
+     - `Content-Type`: `application/json`
+   - Body (JSON):
+     ```json
+     {
+       "title": "{{ $json.title }}",
+       "amount": {{ $json.amount }},
+       "type": "{{ $json.type }}",
+       "category": "{{ $json.category }}",
+       "date": "{{ $json.date || $now.toISOString().split('T')[0] }}",
+       "userId": "{{ $json.userId }}"
+     }
+     ```
+
+### Option 2: Next.js → n8n (Trigger Automations)
+
+**Workflow:**
+1. User creates transaction in Next.js app
+2. Next.js calls `/api/trigger-n8n` endpoint
+3. Endpoint forwards data to n8n webhook
+4. n8n processes workflow (send email, notification, etc.)
+
+**Usage in your Next.js code:**
+```typescript
+// After creating a transaction
+await fetch('/api/trigger-n8n', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    event: 'transaction_created',
+    transaction: { ...transactionData },
+    userId: user.id
+  })
+})
+```
 
 ## Environment Variables
 
-Set these in your Vercel project settings:
+Set these in your `.env.local` file (for local development) and in your Vercel project settings (for production):
 
-- `NEXT_PUBLIC_INSTANT_APP_ID`: Your InstantDB app ID (already set)
-- `API_KEY`: Your secret API key for authenticating requests
+### Required Variables
+
+- `NEXT_PUBLIC_INSTANT_APP_ID`: Your InstantDB app ID
+  - Get from: https://instantdb.com/dash
+  - Example: `94508c4b-4dfd-4f93-bf97-e7f0d362d5e2`
+
+- `INSTANT_ADMIN_TOKEN`: Your InstantDB Admin Token (for server-side operations)
+  - Generate from your InstantDB dashboard
+  - Required for the API routes to write to InstantDB
+
+- `API_KEY`: Your secret API key for authenticating requests from n8n
+  - Use a strong, random string
+  - Generate with: `openssl rand -hex 32` or any secure random generator
+
+### Optional Variables
+
+- `N8N_WEBHOOK_URL`: Your n8n webhook URL (for triggering n8n workflows from Next.js)
+  - Get this from your n8n workflow webhook node
+  - Example: `https://your-n8n-instance.com/webhook/abc123`
+
+### Example `.env.local` file:
+
+```env
+NEXT_PUBLIC_INSTANT_APP_ID=your-instantdb-app-id
+INSTANT_ADMIN_TOKEN=your-instantdb-admin-token
+API_KEY=your-secret-api-key-here
+N8N_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-webhook-id
+```
 
 ## Security Notes
 
@@ -281,4 +355,15 @@ Set these in your Vercel project settings:
 - Check InstantDB dashboard to verify transaction was created
 - Verify `userId` matches the user's ID in InstantDB
 - Check browser console for any client-side errors
+
+### InstantDB Admin SDK Not Configured Error
+- Ensure `INSTANT_ADMIN_TOKEN` is set in your environment variables
+- Generate the Admin Token from your InstantDB dashboard
+- Restart your development server after adding the token
+- For production, add the token to your Vercel environment variables
+
+### n8n Webhook Not Working
+- Verify the `N8N_WEBHOOK_URL` is correct (if using Next.js → n8n flow)
+- Check n8n workflow is active and webhook node is listening
+- Test the webhook URL directly with a tool like Postman or cURL
 
