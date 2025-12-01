@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { X, Calendar } from 'lucide-react'
 import { Transaction } from '@/app/page'
 
 interface TransactionFormProps {
@@ -145,14 +145,20 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Date
           </label>
-          <input
-            type="date"
-            value={formData.date}
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            className="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all max-w-full box-border"
-            style={{ minWidth: 0, width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}
-            required
-          />
+          <div className="relative">
+            <input
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              className="w-full px-4 pr-12 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:border-gray-400 dark:focus:border-gray-500 focus:outline-none outline-none transition-all max-w-full box-border"
+              style={{ minWidth: 0, width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}
+              required
+            />
+            <Calendar 
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" 
+              size={20}
+            />
+          </div>
         </div>
 
         <div className="flex gap-3 pt-4">

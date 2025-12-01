@@ -81,6 +81,10 @@
     padding: 0 !important;
     position: absolute;
     right: 0.5rem;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
   }
   
   /* Force all form inputs to have identical width calculation */
