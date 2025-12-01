@@ -50,6 +50,48 @@
   * {
     -webkit-overflow-scrolling: touch;
   }
+  
+  /* Fix date input width on iOS - force it to match other inputs */
+  input[type="date"] {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    -webkit-appearance: none;
+    appearance: none;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  /* Ensure date input container doesn't overflow */
+  input[type="date"]::-webkit-datetime-edit {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  
+  input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  input[type="date"]::-webkit-inner-spin-button,
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    margin: 0 !important;
+    padding: 0 !important;
+    position: absolute;
+    right: 0.5rem;
+  }
+  
+  /* Force all form inputs to have identical width calculation */
+  form input[type="text"],
+  form input[type="number"],
+  form input[type="date"],
+  form select {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
 }
 
 /* Recharts dark mode styling */

@@ -141,7 +141,7 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
           </select>
         </div>
 
-        <div className="w-full min-w-0">
+        <div className="w-full min-w-0 overflow-hidden">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Date
           </label>
@@ -149,8 +149,8 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
             type="date"
             value={formData.date}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            className="w-full min-w-0 px-3 sm:px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all max-w-full box-border"
-            style={{ minWidth: 0 }}
+            className="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all max-w-full box-border"
+            style={{ minWidth: 0, width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}
             required
           />
         </div>
