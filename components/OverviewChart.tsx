@@ -123,8 +123,12 @@ export default function OverviewChart({ transactions }: OverviewChartProps) {
     }
   }
 
+  // Get pie chart data (expense or income) separately for type safety
+  const pieChartData = overviewType === 'expense' ? expenseData : overviewType === 'income' ? incomeData : []
   const currentData = getCurrentData()
-  const isEmpty = currentData.length === 0 || (overviewType === 'balance' && totalIncome === 0 && totalExpense === 0)
+  const isEmpty = (overviewType === 'balance' 
+    ? (totalIncome === 0 && totalExpense === 0)
+    : pieChartData.length === 0)
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -202,7 +206,7 @@ export default function OverviewChart({ transactions }: OverviewChartProps) {
   // Calculate total for percentage calculation (for pie charts)
   const total = overviewType === 'balance' 
     ? Math.max(totalIncome, totalExpense, Math.abs(balance))
-    : currentData.reduce((sum, item) => sum + item.value, 0)
+    : pieChartData.reduce((sum, item) => sum + item.value, 0)
 
   if (isEmpty) {
     const emptyMsg = getEmptyMessage()
@@ -319,7 +323,7 @@ export default function OverviewChart({ transactions }: OverviewChartProps) {
           ) : (
             <PieChart>
               <Pie
-                data={currentData}
+                data={pieChartData}
                 cx="50%"
                 cy={isMobile ? "40%" : "50%"}
                 labelLine={false}
@@ -328,7 +332,7 @@ export default function OverviewChart({ transactions }: OverviewChartProps) {
                 fill="#8884d8"
                 dataKey="value"
               >
-                {currentData.map((entry, index) => (
+                {pieChartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
