@@ -46,7 +46,7 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
   }
 
   return (
-    <div>
+    <div className="w-full min-w-0">
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <h2 className="text-xl sm:text-2xl font-bold gradient-text">Add Transaction</h2>
         <button
@@ -58,7 +58,7 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 w-full min-w-0">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Type
@@ -141,7 +141,7 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
           </select>
         </div>
 
-        <div>
+        <div className="w-full min-w-0">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Date
           </label>
@@ -149,7 +149,8 @@ export default function TransactionForm({ onSubmit, onCancel }: TransactionFormP
             type="date"
             value={formData.date}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            className="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all max-w-full box-border"
+            className="w-full min-w-0 px-3 sm:px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all max-w-full box-border"
+            style={{ minWidth: 0 }}
             required
           />
         </div>
