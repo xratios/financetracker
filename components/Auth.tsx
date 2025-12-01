@@ -64,19 +64,19 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 via-blue-50 to-cyan-100 p-6">
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl max-w-md w-full p-8 border border-cyan-100">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent mb-2">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 via-blue-50 to-cyan-100 p-4 sm:p-6">
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-cyan-100">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent mb-2">
             Finance Tracker
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm sm:text-base">
             {codeSent ? 'Enter verification code' : 'Sign in to access your transactions'}
           </p>
         </div>
 
         {!codeSent ? (
-          <form onSubmit={handleSendCode} className="space-y-6">
+          <form onSubmit={handleSendCode} className="space-y-4 sm:space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
@@ -89,7 +89,7 @@ export default function Auth() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full pl-10 pr-4 py-3 border border-cyan-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-white/50"
+                  className="w-full pl-10 pr-4 py-3 text-base border border-cyan-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-white/50"
                   required
                   disabled={isLoading}
                 />
@@ -111,7 +111,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white py-3 rounded-xl font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white py-3 rounded-xl font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation min-h-[44px] text-sm sm:text-base"
             >
               {isLoading ? (
                 <>
@@ -127,7 +127,7 @@ export default function Auth() {
             </button>
           </form>
         ) : (
-          <form onSubmit={handleVerifyCode} className="space-y-6">
+          <form onSubmit={handleVerifyCode} className="space-y-4 sm:space-y-6">
             <div>
               <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-2">
                 Verification Code
@@ -143,7 +143,7 @@ export default function Auth() {
                     setCode(value)
                   }}
                   placeholder="000000"
-                  className="w-full pl-10 pr-4 py-3 border border-cyan-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-white/50 text-center text-2xl font-mono tracking-widest"
+                  className="w-full pl-10 pr-4 py-3 border border-cyan-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-white/50 text-center text-xl sm:text-2xl font-mono tracking-widest"
                   required
                   disabled={isLoading}
                   maxLength={6}
@@ -172,7 +172,7 @@ export default function Auth() {
                 type="button"
                 onClick={handleBack}
                 disabled={isLoading}
-                className="px-4 py-3 border border-cyan-200 text-cyan-600 rounded-xl font-semibold hover:bg-cyan-50 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-3 border border-cyan-200 text-cyan-600 rounded-xl font-semibold hover:bg-cyan-50 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation min-h-[44px] text-sm sm:text-base"
               >
                 <ArrowLeft size={18} />
                 Back
@@ -180,7 +180,7 @@ export default function Auth() {
               <button
                 type="submit"
                 disabled={isLoading || code.length !== 6}
-                className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 text-white py-3 rounded-xl font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 text-white py-3 rounded-xl font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation min-h-[44px] text-sm sm:text-base"
               >
                 {isLoading ? (
                   <>

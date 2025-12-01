@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Transaction } from '@/app/page'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
 
@@ -21,6 +22,17 @@ const COLORS = [
 ]
 
 export default function ExpenseChart({ transactions }: ExpenseChartProps) {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   // Calculate expenses by category
   const expenseData = transactions
     .filter(t => t.type === 'expense')
@@ -36,9 +48,9 @@ export default function ExpenseChart({ transactions }: ExpenseChartProps) {
 
   if (expenseData.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500 dark:text-gray-400">No expense data to display</p>
-        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Add some expenses to see the chart</p>
+      <div className="text-center py-8 sm:py-12">
+        <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">No expense data to display</p>
+        <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-1">Add some expenses to see the chart</p>
       </div>
     )
   }
@@ -60,8 +72,12 @@ export default function ExpenseChart({ transactions }: ExpenseChartProps) {
     return null
   }
 
+  const outerRadius = isMobile ? 70 : 100
+  const legendFontSize = isMobile ? '12px' : '14px'
+  const iconSize = isMobile ? 10 : 14
+
   return (
-    <div className="w-full h-[300px]">
+    <div className="w-full h-[250px] sm:h-[300px] md:h-[350px]">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -69,8 +85,14 @@ export default function ExpenseChart({ transactions }: ExpenseChartProps) {
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-            outerRadius={100}
+            label={({ name, percent }) => {
+              // Hide labels on very small screens, show on larger
+              if (isMobile) {
+                return ''
+              }
+              return `${name} ${(percent * 100).toFixed(0)}%`
+            }}
+            outerRadius={outerRadius}
             fill="#8884d8"
             dataKey="value"
           >
@@ -80,7 +102,11 @@ export default function ExpenseChart({ transactions }: ExpenseChartProps) {
           </Pie>
           <Tooltip content={<CustomTooltip />} />
           <Legend 
-            wrapperStyle={{ color: '#d1d5db' }}
+            wrapperStyle={{ 
+              color: '#d1d5db',
+              fontSize: legendFontSize
+            }}
+            iconSize={iconSize}
           />
         </PieChart>
       </ResponsiveContainer>

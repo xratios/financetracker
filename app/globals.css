@@ -25,6 +25,31 @@
   .card-hover {
     @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1 dark:hover:shadow-2xl;
   }
+  
+  .bg-gradient-orange {
+    @apply bg-gradient-to-r from-orange-500 to-orange-600;
+  }
+  
+  /* Mobile optimizations */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  /* Prevent text size adjustment on iOS */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  
+  /* Improve scrolling on mobile */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Recharts dark mode styling */
