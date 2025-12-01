@@ -6,7 +6,7 @@ import { id, tx } from '@instantdb/react'
 import TransactionList from '@/components/TransactionList'
 import TransactionForm from '@/components/TransactionForm'
 import StatsCard from '@/components/StatsCard'
-import ExpenseChart from '@/components/ExpenseChart'
+import OverviewChart from '@/components/OverviewChart'
 import Auth from '@/components/Auth'
 import { db } from '@/lib/instant'
 
@@ -217,8 +217,7 @@ export default function Home() {
           {/* Chart Section */}
           <div className="lg:col-span-2 order-2 lg:order-1">
             <div className="glass-effect rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover">
-              <h2 className="text-xl sm:text-2xl font-bold gradient-text mb-4 sm:mb-6">Expense Overview</h2>
-              <ExpenseChart transactions={transactions} />
+              <OverviewChart transactions={transactions} />
             </div>
           </div>
 

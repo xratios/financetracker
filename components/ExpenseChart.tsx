@@ -72,26 +72,45 @@ export default function ExpenseChart({ transactions }: ExpenseChartProps) {
     return null
   }
 
+  const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, name, percent }: any) => {
+    const RADIAN = Math.PI / 180
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+    const x = cx + radius * Math.cos(-midAngle * RADIAN)
+    const y = cy + radius * Math.sin(-midAngle * RADIAN)
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="#374151"
+        textAnchor={x > cx ? 'start' : 'end'}
+        dominantBaseline="central"
+        fontSize={isMobile ? '10px' : '12px'}
+        fontWeight="500"
+        className="dark:fill-gray-300"
+      >
+        {`${name} ${(percent * 100).toFixed(0)}%`}
+      </text>
+    )
+  }
+
   const outerRadius = isMobile ? 70 : 100
   const legendFontSize = isMobile ? '12px' : '14px'
   const iconSize = isMobile ? 10 : 14
 
+  // Calculate total for percentage calculation
+  const total = expenseData.reduce((sum, item) => sum + item.value, 0)
+
   return (
-    <div className="w-full h-[250px] sm:h-[300px] md:h-[350px]">
+    <div className="w-full h-[280px] sm:h-[300px] md:h-[350px]">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
             data={expenseData}
             cx="50%"
-            cy="50%"
+            cy={isMobile ? "40%" : "50%"}
             labelLine={false}
-            label={({ name, percent }) => {
-              // Hide labels on very small screens, show on larger
-              if (isMobile) {
-                return ''
-              }
-              return `${name} ${(percent * 100).toFixed(0)}%`
-            }}
+            label={CustomLabel}
             outerRadius={outerRadius}
             fill="#8884d8"
             dataKey="value"
@@ -104,9 +123,17 @@ export default function ExpenseChart({ transactions }: ExpenseChartProps) {
           <Legend 
             wrapperStyle={{ 
               color: '#d1d5db',
-              fontSize: legendFontSize
+              fontSize: legendFontSize,
+              paddingTop: isMobile ? '10px' : '0'
             }}
             iconSize={iconSize}
+            verticalAlign={isMobile ? "bottom" : undefined}
+            align="center"
+            formatter={(value, entry: any) => {
+              if (!entry || !entry.payload) return value
+              const percent = total > 0 ? ((entry.payload.value / total) * 100).toFixed(0) : '0'
+              return `${value} ${percent}%`
+            }}
           />
         </PieChart>
       </ResponsiveContainer>
