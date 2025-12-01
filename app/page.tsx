@@ -143,6 +143,11 @@ export default function Home() {
             <div className="flex-1 min-w-0">
               <h1 className="text-2xl sm:text-3xl font-bold truncate">Finance Tracker</h1>
               <p className="text-orange-100 dark:text-orange-200 mt-1 text-sm sm:text-base">Manage your money with confidence</p>
+              {user && (
+                <p className="text-orange-100 dark:text-orange-200 mt-1 text-xs sm:hidden truncate">
+                  {user.email || 'User'}
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               {user && (
